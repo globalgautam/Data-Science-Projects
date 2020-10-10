@@ -1,0 +1,142 @@
+
+
+#install/import packages libraries
+import matplotlib.pylab as pylab # visualization
+import matplotlib.pyplot as plt # visualization
+
+import matplotlib as mpl  # visualization
+import pandas as pd # EDA
+import numpy as np # EDA
+import matplotlib # visualization
+import seaborn as sb # visualization
+
+# code to see the output of multiple lines of codes
+from IPython.core.interactiveshell import InteractiveShell
+InteractiveShell.ast_node_interactivity = 'all'
+
+# read the titanic dataset
+house_price = pd.read_csv('C:\\Users\\Gautam\\Documents\\R\\house_prices\\train.csv')
+
+# check missing data
+def check_missing_data(df):
+    flag=df.isna().sum().any()
+    if flag==True:
+        total = df.isnull().sum()
+        percent = (df.isnull().sum())/(df.isnull().count()*100)
+        output = pd.concat([total, percent], axis=1, keys=['Total', 'Percent'])
+        data_type = []
+        for col in df.columns:
+            dtype = str(df[col].dtype)
+            data_type.append(dtype)
+        output['Types'] = data_type
+        return(np.transpose(output))
+    else:
+        return(print('No missing value found on dataset'))
+
+# define a function to impute the dataset
+def impute_data(df):
+    df['LotFrontage'] = df['LotFrontage'].fillna(np.mean(df['LotFrontage']))
+    df['MasVnrArea'] = df['MasVnrArea'].fillna(np.mean(df['MasVnrArea']))
+    df['Alley'] = df['Alley'].fillna('Othr')
+    df['PoolQC'] = df['PoolQC'].fillna('NA')
+    df['Fence'] = df['Fence'].fillna('NA')
+    df['MiscFeature'] = df['MiscFeature'].fillna('NA')
+    df['MSZoning'] = df['MSZoning'].fillna('NA')
+    df['Utilities'] = df['Utilities'].fillna('AllPub')
+    df['SaleType'] = df['SaleType'].fillna('NA')
+    df['MasVnrType'] = df['MasVnrType'].fillna('None')
+    df['BsmtQual'] = df['BsmtQual'].fillna('NA')
+    df['BsmtCond'] = df['BsmtCond'].fillna('NA')
+    df['BsmtExposure'] = df['BsmtExposure'].fillna('No')
+    df['BsmtFinType1'] = df['BsmtFinType1'].fillna('Othr')
+    df['Heating'] = df['Heating'].fillna('Othr')
+    df['Electrical'] = df['Electrical'].fillna('Mix')
+    df['FireplaceQu'] = df['FireplaceQu'].fillna('NA')
+    df['GarageType'] = df['GarageType'].fillna('NA')
+    df['GarageFinish'] = df['GarageFinish'].fillna('NA')
+    df['GarageQual'] = df['GarageQual'].fillna('NA')
+    df['GarageCond'] = df['GarageCond'].fillna('NA')
+    df['BsmtFinType2'] = df['BsmtFinType2'].fillna('NA')
+    df['GarageYrBlt'] = df['GarageYrBlt'].fillna('NA')
+    return df
+
+# define a function to cap the outliers on the given columns
+def cap_values(df):
+    col_names = ['LotArea','MasVnrArea','BsmtFinSF2', 'BsmtUnfSF', 'TotalBsmtSF',
+                 'LowQualFinSF', 'GrLivArea','PoolArea']
+    for i in col_names:
+        Qtr1 = df[i].quantile(0.25)
+        Qtr3 = df[i].quantile(0.75)
+        
+        IQR = Qtr3 - Qtr1
+        
+        for j in range(len(df)):
+            if df[i][j] < (Qtr1 - 1.5 * IQR):
+                df[i][j] = Qtr1
+            if df[i][j] > (Qtr3 + 1.5 * IQR):
+                df[i][j] = Qtr3
+        
+        df[np.logical_or(df[i] < (Qtr1 - 1.5 * IQR),
+                         df[i] > (Qtr3 + 1.5 * IQR))]
+    return df
+
+# checke the missing data and then impute the dataset for missing values
+check_missing_data(house_price)
+impute_data(house_price)
+
+	Id 	MSSubClass 	MSZoning 	LotFrontage 	LotArea 	Street 	Alley 	LotShape 	LandContour 	Utilities 	... 	PoolArea 	PoolQC 	Fence 	MiscFeature 	MiscVal 	MoSold 	YrSold 	SaleType 	SaleCondition 	SalePrice
+Total 	0 	0 	0 	259 	0 	0 	1369 	0 	0 	0 	... 	0 	1453 	1179 	1406 	0 	0 	0 	0 	0 	0
+Percent 	0 	0 	0 	0.00177397 	0 	0 	0.00937671 	0 	0 	0 	... 	0 	0.00995205 	0.00807534 	0.00963014 	0 	0 	0 	0 	0 	0
+Types 	int64 	int64 	object 	float64 	int64 	object 	object 	object 	object 	object 	... 	int64 	object 	object 	object 	int64 	int64 	int64 	object 	object 	int64
+
+3 rows × 81 columns
+	Id 	MSSubClass 	MSZoning 	LotFrontage 	LotArea 	Street 	Alley 	LotShape 	LandContour 	Utilities 	... 	PoolArea 	PoolQC 	Fence 	MiscFeature 	MiscVal 	MoSold 	YrSold 	SaleType 	SaleCondition 	SalePrice
+0 	1 	60 	RL 	65.0 	8450 	Pave 	Othr 	Reg 	Lvl 	AllPub 	... 	0 	NA 	NA 	NA 	0 	2 	2008 	WD 	Normal 	208500
+1 	2 	20 	RL 	80.0 	9600 	Pave 	Othr 	Reg 	Lvl 	AllPub 	... 	0 	NA 	NA 	NA 	0 	5 	2007 	WD 	Normal 	181500
+2 	3 	60 	RL 	68.0 	11250 	Pave 	Othr 	IR1 	Lvl 	AllPub 	... 	0 	NA 	NA 	NA 	0 	9 	2008 	WD 	Normal 	223500
+3 	4 	70 	RL 	60.0 	9550 	Pave 	Othr 	IR1 	Lvl 	AllPub 	... 	0 	NA 	NA 	NA 	0 	2 	2006 	WD 	Abnorml 	140000
+4 	5 	60 	RL 	84.0 	14260 	Pave 	Othr 	IR1 	Lvl 	AllPub 	... 	0 	NA 	NA 	NA 	0 	12 	2008 	WD 	Normal 	250000
+... 	... 	... 	... 	... 	... 	... 	... 	... 	... 	... 	... 	... 	... 	... 	... 	... 	... 	... 	... 	... 	...
+1455 	1456 	60 	RL 	62.0 	7917 	Pave 	Othr 	Reg 	Lvl 	AllPub 	... 	0 	NA 	NA 	NA 	0 	8 	2007 	WD 	Normal 	175000
+1456 	1457 	20 	RL 	85.0 	13175 	Pave 	Othr 	Reg 	Lvl 	AllPub 	... 	0 	NA 	MnPrv 	NA 	0 	2 	2010 	WD 	Normal 	210000
+1457 	1458 	70 	RL 	66.0 	9042 	Pave 	Othr 	Reg 	Lvl 	AllPub 	... 	0 	NA 	GdPrv 	Shed 	2500 	5 	2010 	WD 	Normal 	266500
+1458 	1459 	20 	RL 	68.0 	9717 	Pave 	Othr 	Reg 	Lvl 	AllPub 	... 	0 	NA 	NA 	NA 	0 	4 	2010 	WD 	Normal 	142125
+1459 	1460 	20 	RL 	75.0 	9937 	Pave 	Othr 	Reg 	Lvl 	AllPub 	... 	0 	NA 	NA 	NA 	0 	6 	2008 	WD 	Normal 	147500
+
+1460 rows × 81 columns
+
+# cap the outliers
+house_price_new = cap_values(house_price)
+
+C:\Users\Gautam\Anaconda3\lib\site-packages\ipykernel_launcher.py:58: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame
+
+See the caveats in the documentation: http://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+C:\Users\Gautam\Anaconda3\lib\site-packages\ipykernel_launcher.py:56: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame
+
+See the caveats in the documentation: http://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+
+    col_names = ['GarageType', 'SaleCondition', 'HouseStyle', 'FullBath', 'RoofStyle', 'Fireplaces',
+                 'KitchenQual', 'YearRemodAdd']
+    for i in col_names:
+        house_price_new.boxplot(column='SalePrice',by=house_price_new[i])
+
+<matplotlib.axes._subplots.AxesSubplot at 0x28edf6a7a88>
+
+<matplotlib.axes._subplots.AxesSubplot at 0x28ee0c61708>
+
+<matplotlib.axes._subplots.AxesSubplot at 0x28ee0aa1088>
+
+<matplotlib.axes._subplots.AxesSubplot at 0x28ee0c0f648>
+
+<matplotlib.axes._subplots.AxesSubplot at 0x28ee0cdae88>
+
+<matplotlib.axes._subplots.AxesSubplot at 0x28ee0e4dfc8>
+
+<matplotlib.axes._subplots.AxesSubplot at 0x28ee0ed9a08>
+
+<matplotlib.axes._subplots.AxesSubplot at 0x28ee0f64e88>
+
+ 
+
